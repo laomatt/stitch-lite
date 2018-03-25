@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "4fb5b1dc54dd2b8b60c03c549cf03c76",
+    "content-hash": "d0e892e12d89646a188a0bbc7b3f35e7",
     "packages": [
         {
             "name": "defuse/php-encryption",
@@ -1015,16 +1015,16 @@
         },
         {
             "name": "laravelcollective/html",
-            "version": "v5.6.3",
+            "version": "v5.6.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/LaravelCollective/html.git",
-                "reference": "41cd9291a69bd24f2184e504be041348a87308a8"
+                "reference": "623a150c91e2d3f92eeee9f9eda58a841e3cb548"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/LaravelCollective/html/zipball/41cd9291a69bd24f2184e504be041348a87308a8",
-                "reference": "41cd9291a69bd24f2184e504be041348a87308a8",
+                "url": "https://api.github.com/repos/LaravelCollective/html/zipball/623a150c91e2d3f92eeee9f9eda58a841e3cb548",
+                "reference": "623a150c91e2d3f92eeee9f9eda58a841e3cb548",
                 "shasum": ""
             },
             "require": {
@@ -1079,7 +1079,7 @@
             ],
             "description": "HTML and Form Builders for the Laravel Framework",
             "homepage": "https://laravelcollective.com",
-            "time": "2018-02-12T14:19:42+00:00"
+            "time": "2018-03-16T16:57:31+00:00"
         },
         {
             "name": "lcobucci/jwt",
@@ -3010,6 +3010,54 @@
             "time": "2017-11-27T11:13:29+00:00"
         },
         {
+            "name": "vendapi/vendapi",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/brucealdridge/VendAPI.git",
+                "reference": "ecbb6defdf55201aae53def80345af2d9ac1cf4e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/brucealdridge/VendAPI/zipball/ecbb6defdf55201aae53def80345af2d9ac1cf4e",
+                "reference": "ecbb6defdf55201aae53def80345af2d9ac1cf4e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "VendAPI": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bruce Aldridge",
+                    "email": "bruce@incode.co.nz",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Arjan Scherpenisse",
+                    "email": "arjan@scherpenisse.net",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Vend API class",
+            "homepage": "http://github.com/brucealdridge/vendapi",
+            "keywords": [
+                "e-commerce",
+                "shop",
+                "shopping"
+            ],
+            "time": "2017-08-24T21:26:56+00:00"
+        },
+        {
             "name": "vlucas/phpdotenv",
             "version": "v2.4.0",
             "source": {
@@ -4856,7 +4904,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "vendapi/vendapi": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

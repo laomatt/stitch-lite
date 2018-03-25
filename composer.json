@@ -11,7 +11,8 @@
         "rocket-code/shopify": "~2.0",
         "laravel/passport": "^5.0",
         "laravel/tinker": "^1.0",
-        "laravelcollective/html": "~5.0"
+        "laravelcollective/html": "~5.0",
+        "vendapi/vendapi": "dev-master"
     },
     "require-dev": {
         "filp/whoops": "^2.0",

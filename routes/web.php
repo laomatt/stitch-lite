@@ -16,13 +16,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('user/{id}', 'UserController@showProfile');
-Route::get('users', 'UserController@listUsers');
-Route::get('user', 'UserController@newUser');
-Route::post('user', array('before' => 'csrf', function()
-{
-}));
-
 Route::get('/shopify', 'ProductController@listProductsShopify');
 Route::get('/vend', 'ProductController@listProductsVend');
+
+Route::get('/api/products', 'ProductController@index');
+Route::get('/api/sync', 'ProductController@update');
+Route::get('/api/sync', 'ProductController@show');
 
