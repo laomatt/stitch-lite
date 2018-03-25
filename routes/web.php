@@ -23,5 +23,6 @@ Route::post('user', array('before' => 'csrf', function()
 {
 }));
 
-Route::get('/shopify', 'ProductController@listProducts');
+Route::get('/shopify', 'ProductController@listProductsShopify');
+Route::get('/vend', 'ProductController@listProductsVend');
 

@@ -13,26 +13,31 @@ use App;
 
 class ProductController extends BaseController {
 
-	public function listProducts()
+	public function listProductsShopify()
     {
+    		$apiKey = env('SHOPIFY_KEY');
+    		$apiSecret = env('SHOPIFY_SECRET');
+    		$access = env('SHOPIFY_TOKEN');
+
 				$sh = App::make(
 					'ShopifyAPI',
-					[
-						'API_KEY' => env('SHOPIFY_KEY'), 
-						'API_SECRET' => env('SHOPIFY_SECRET'), 
-						'SHOP_DOMAIN' => 'mattsteststore2.myshopify.com/admin/shop.json', 
-						'ACCESS_TOKEN' => env('SHOPIFY_TOKEN')
-					]
+		    	['API_KEY' => $apiKey, 'API_SECRET' => $apiSecret]
 				);
 
-				// $sh->setup();
+				$sh->setup(['SHOP_DOMAIN' => 'mattsteststore2.myshopify.com/admin/products.json', 'ACCESS_TOKEN' => $access]);
 
 				$args = [
-					'METHOD' => 'GET',
 					'ALLDATA' => true,
+					'URL' => 'products.json',
 				];
 
-				return var_dump($sh->call($args));
-				// return var_dump($sh);
+				return var_dump($sh->call($args)->products);
+    }
+
+    	public function listProductsVend()
+    {
+
+
+				// return var_dump($sh->call($args)->products);
     }
  }
