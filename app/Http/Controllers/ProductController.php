@@ -33,14 +33,39 @@ class ProductController extends BaseController {
 					'URL' => 'products.json',
 				];
 
-				return var_dump($sh->call($args)->products);
+				$products = $sh->call($args)->products;
+				$prods = [];
+				foreach ($products as $key => $value) {
+					foreach ($value->variants as $k => $variant) {
+						// create variant items if skus doesn't exist
+						$product = Product::where("sku","=", $variant->sku);
+						if ($product->count() > 0) {
+							$product = $product->firstOrFail();
+						} else {
+							$product = new Product;
+							$product->name = $value->title." (".$variant->title.")";
+							$product->sku = $variant->sku;
+							$product->price = $variant->price;
+							$product->quantity = $variant->inventory_quantity;
+						}
+
+						// TODO: log all updating
+						// return var_dump(Product::where("sku","=", 'bat-555')->count());
+						// $product->save();
+
+					}
+				}
+
+				return var_dump(Product::all());
     }
 
     	public function listProductsVend()
     {
-    	$token = env('VEND_ACCESS_TOKEN');
-    	$type = env('VEND_TOKEN_TYPE');
 			$vend = new VendAPI\VendAPI('https://mattsexample.vendhq.com','Bearer','KWDZNSo67gRgRdxANKYrG_hyDFMY9MH5WM4yOrhA');
+			$vends = [];
+			foreach ($vend->getProducts() as $key => $value) {
+				// array_push($vends, $key);
+			}
 			return var_dump($vend->getProducts());
 
 				// TODO: if the token is expired, then we must request refresh of token
@@ -57,8 +82,8 @@ class ProductController extends BaseController {
     }
 
     public function index(){
-    	// 
-
+    	// cycle through all shopify products
+    	
     	// $product = new Product;
     	// $product->name = Input::get('name');
     	// $product->sku = Input::get('email');
@@ -66,9 +91,13 @@ class ProductController extends BaseController {
     	// $product->price = Input::get('password');
     }
 
-    public function update(){}
+    public function update(){
+    	// get all products from shopify
 
-    
+    	// get all products from vend
+    }
+
+
     public function show(){}
 
     private function requestTokenRefresh()
