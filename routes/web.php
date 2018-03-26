@@ -21,6 +21,9 @@ Route::get('/example', 'ProductController@example');
 
 Route::get('/api/products', 'ProductController@index');
 Route::get('/api/product/{id}', 'ProductController@show');
-Route::put('/api/product/{id}', 'ProductController@update');
+
+// TODO: add end point to update quantity from the back end
+// Route::put('/api/product/{id}', 'ProductController@update');
+
 Route::get('/api/sync', 'ProductController@sync');
 

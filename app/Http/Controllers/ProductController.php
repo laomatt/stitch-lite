@@ -9,9 +9,9 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Html\Form;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Input;
 use App;
 use VendAPI;
-// use Illuminate\Html\Form;
 
 class ProductController extends BaseController {
 
@@ -112,6 +112,7 @@ class ProductController extends BaseController {
     public function index()
     {
     	// cycle through all shopify products
+    	return Product::all();
 
     }
 
@@ -122,19 +123,7 @@ class ProductController extends BaseController {
 					// add the record
 				// else
 		    	// update record
-    }
-
-    private function syncVend($data)
-    {
-		   // check if this sku exists in Vend
-				// if not 
-					// add the record
-				// else
-		    	// update record    	
-    }
-
-    public function example(){
-			$apiKey = env('SHOPIFY_KEY');
+    	$apiKey = env('SHOPIFY_KEY');
   		$apiSecret = env('SHOPIFY_SECRET');
   		$access = env('SHOPIFY_TOKEN');
 
@@ -143,7 +132,8 @@ class ProductController extends BaseController {
 	    	['API_KEY' => $apiKey, 'API_SECRET' => $apiSecret]
 			);
 
-			$sh->setup(['SHOP_DOMAIN' => 'mattsteststore2.myshopify.com', 'ACCESS_TOKEN' => $access]);
+			// went through the entire token getting process 5 times, this token still wouldn't update to 'write_product' scope
+			$sh->setup(['SHOP_DOMAIN' => 'mattsteststore2.myshopify.com', 'ACCESS_TOKEN' => '2ef2cf6e0023e84eeebe999c0da58962']);
 			
 			$list_args = [
 					'ALLDATA' => true,
@@ -183,9 +173,20 @@ class ProductController extends BaseController {
 			// TODO:
 			// find all products with sku's not in $prods
 			// push that product up
+    	return var_dump(Product::all());
+    }
 
-			// $product = Product::where("sku","=",'thr-222')->first()->quantity;
-    	// return var_dump($product);
+    private function syncVend($data)
+    {
+	    	// TODO:
+		   // check if this sku exists in Vend
+				// if not 
+					// add the record
+				// else
+		    	// update record    	
+    }
+
+    public function example(){
     	return var_dump(Product::all());
     }
 
@@ -203,7 +204,6 @@ class ProductController extends BaseController {
 
     	$vends = [];
     	foreach ($products as $key => $product) {
-    		// array_push($vends, $product->sku);
 	    	// push up to Shopify
 		    	$this::syncShopify($product);
 	    	// push up to Vend
@@ -215,10 +215,10 @@ class ProductController extends BaseController {
     }
 
     // displays information for one product
-    public function show()
+    public function show($id)
     {
-
-    	// return a product as a json object
+    	$product = Product::find($id);
+    	return $product;
     }
 
 
