@@ -164,7 +164,6 @@ class ProductController extends BaseController {
 			// TODO:
 			// find all products with sku's not in $prods
 			// push that product up
-    	return var_dump(Product::all());
     }
 
     private function syncVend($data)
@@ -175,10 +174,6 @@ class ProductController extends BaseController {
 					// add the record
 				// else
 		    	// update record    	
-    }
-
-    public function example(){
-    	return var_dump(Product::all());
     }
 
     // Syncs all products, updates quantities to the lowest quantity found in the APIs
