@@ -38,13 +38,12 @@ class ProductController extends BaseController {
 				$prods = [];
 				foreach ($products as $key => $value) {
 					foreach ($value->variants as $k => $variant) {
-						$product = Product::where("sku","=", $variant->sku)->first();
+						$product = Product::where("sku","=", $variant->sku);
 						if ($product->count() > 0) {
 							$product = $product->firstOrFail();
 							$current_quantity = $product->quantity;
 							$api_quantity = $variant->inventory_quantity;
 							$quantity = min($current_quantity,$api_quantity);
-							// $quantity = 900;
 						} else {
 							// create variant items if skus doesn't exist
 							$quantity = $variant->inventory_quantity;
@@ -78,7 +77,7 @@ class ProductController extends BaseController {
 				$sku = $value->sku;
 				$price = $value->price;
 
-				$product = Product::where("sku","=",$sku)->first();
+				$product = Product::where("sku","=",$sku);
 				
 				if (is_null($value->inventory[0])) {
 					continue;
