@@ -43,7 +43,8 @@ class ProductController extends BaseController {
 							$product = $product->firstOrFail();
 							$current_quantity = $product->quantity;
 							$api_quantity = $variant->inventory_quantity;
-							$quantity = min($current_quantity,$api_quantity);
+							$difference = abs($current_quantity - $api_quantity);
+							$quantity = $current_quantity - $difference;
 						} else {
 							// create variant items if skus doesn't exist
 							$quantity = $variant->inventory_quantity;
@@ -82,11 +83,15 @@ class ProductController extends BaseController {
 				if (is_null($value->inventory[0])) {
 					continue;
 				}
+
+				// TODO: centralize this code somewhere else
 				if ($product->count() > 0) {
 					$product = $product->firstOrFail();
 					$current_quantity = $product->quantity;
 					$api_quantity = $value->inventory[0]->count;
-					$quantity = min($current_quantity,$api_quantity);
+					// we want to take the difference between our current min and the what in the API
+					$difference = abs($current_quantity - $api_quantity);
+					$quantity = $current_quantity - $difference;
 				} else {
 					$product = new Product;
 					$quantity = $value->inventory[0]->count;
@@ -125,6 +130,7 @@ class ProductController extends BaseController {
 
 			// went through the entire token getting process 5 times, this token still wouldn't update to 'write_product' scope
 			$sh->setup(['SHOP_DOMAIN' => 'mattsteststore2.myshopify.com', 'ACCESS_TOKEN' => '2ef2cf6e0023e84eeebe999c0da58962']);
+			// $sh->setup(['SHOP_DOMAIN' => 'mattsteststore2.myshopify.com', 'ACCESS_TOKEN' => $access]);
 			
 			$list_args = [
 					'ALLDATA' => true,
@@ -184,18 +190,20 @@ class ProductController extends BaseController {
     	// get all products from vend to the database
     	$this::listProductsVend();
 
+    	// TODO: want a section to push up database quanities to each API
     	// cycle through the products table
-    	$products = Product::all();
-
-    	$vends = [];
-    	foreach ($products as $key => $product) {
+    	// $products = Product::all();
+    	// foreach ($products as $key => $product) {
 	    	// push up to Shopify
-		    	$this::syncShopify($product);
+		    	// $this::syncShopify($product);
 	    	// push up to Vend
-		    	$this::syncVend($product);
-    	}
+		    	// $this::syncVend($product);
+    	// }
     	
-			return var_dump($vends);
+			return response()->json([
+			    'code' => '200',
+			    'message' => 'API successfully synced'
+			]);
 
     }
 
