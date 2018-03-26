@@ -63,7 +63,6 @@ class ProductController extends BaseController {
 					}
 				}
 
-				// return var_dump(Product::all());
     }
 
   // gets and updates products from Vend API
@@ -104,8 +103,6 @@ class ProductController extends BaseController {
 			// TODO: if the token is expired, then we must request refresh of token
 			// TODO: log all updating
 
-			// return var_dump($vends);
-			// return var_dump(Product::all());
     }
 
 
@@ -118,11 +115,6 @@ class ProductController extends BaseController {
 
     private function syncShopify($data)
     {
-		   // check if this sku exists in Shopify
-				// if not 
-					// add the record
-				// else
-		    	// update record
     	$apiKey = env('SHOPIFY_KEY');
   		$apiSecret = env('SHOPIFY_SECRET');
   		$access = env('SHOPIFY_TOKEN');
@@ -139,7 +131,6 @@ class ProductController extends BaseController {
 					'ALLDATA' => true,
 					'URL' => "/admin/products.json",
 			];
-			// $variant->inventory_quantity;
 			$prods = [];
 			// get a list of current products of shopify
 			$products = $sh->call($list_args)->products;

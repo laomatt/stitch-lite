@@ -10,20 +10,12 @@
 |
 */
 
-// Route::post('user', 'UserController@createUser');
-
-Route::get('/', function () {
-    return view('welcome');
-});
-
-Route::get('/shopify', 'ProductController@listProductsShopify');
-Route::get('/example', 'ProductController@example');
 
 Route::get('/api/products', 'ProductController@index');
 Route::get('/api/product/{id}', 'ProductController@show');
+Route::get('/api/sync', 'ProductController@sync');
 
 // TODO: add end point to update quantity from the back end
 // Route::put('/api/product/{id}', 'ProductController@update');
 
-Route::get('/api/sync', 'ProductController@sync');
 
