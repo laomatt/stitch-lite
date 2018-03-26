@@ -17,9 +17,10 @@ Route::get('/', function () {
 });
 
 Route::get('/shopify', 'ProductController@listProductsShopify');
-Route::get('/vend', 'ProductController@listProductsVend');
+Route::get('/example', 'ProductController@example');
 
 Route::get('/api/products', 'ProductController@index');
-Route::get('/api/sync', 'ProductController@update');
-Route::get('/api/sync', 'ProductController@show');
+Route::get('/api/product/{id}', 'ProductController@show');
+Route::put('/api/product/{id}', 'ProductController@update');
+Route::get('/api/sync', 'ProductController@sync');
 

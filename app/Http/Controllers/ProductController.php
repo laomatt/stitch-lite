@@ -15,7 +15,8 @@ use VendAPI;
 
 class ProductController extends BaseController {
 
-	public function listProductsShopify()
+	// gets and updates products from shopify API
+	private function listProductsShopify()
     {
     		$apiKey = env('SHOPIFY_KEY');
     		$apiSecret = env('SHOPIFY_SECRET');
@@ -37,68 +38,189 @@ class ProductController extends BaseController {
 				$prods = [];
 				foreach ($products as $key => $value) {
 					foreach ($value->variants as $k => $variant) {
-						// create variant items if skus doesn't exist
-						$product = Product::where("sku","=", $variant->sku);
+						$product = Product::where("sku","=", $variant->sku)->first();
 						if ($product->count() > 0) {
 							$product = $product->firstOrFail();
+							$current_quantity = $product->quantity;
+							$api_quantity = $variant->inventory_quantity;
+							$quantity = min($current_quantity,$api_quantity);
+							// $quantity = 900;
 						} else {
+							// create variant items if skus doesn't exist
+							$quantity = $variant->inventory_quantity;
 							$product = new Product;
-							$product->name = $value->title." (".$variant->title.")";
-							$product->sku = $variant->sku;
-							$product->price = $variant->price;
-							$product->quantity = $variant->inventory_quantity;
 						}
 
+
+						$product->name = $value->title." (".$variant->title.")";
+						$product->sku = $variant->sku;
+						$product->price = $variant->price;
+						$product->quantity = $quantity;
+						$product->save();
+
 						// TODO: log all updating
-						// return var_dump(Product::where("sku","=", 'bat-555')->count());
-						// $product->save();
 
 					}
 				}
 
-				return var_dump(Product::all());
+				// return var_dump(Product::all());
     }
 
-    	public function listProductsVend()
+  // gets and updates products from Vend API
+	private function listProductsVend()
     {
 			$vend = new VendAPI\VendAPI('https://mattsexample.vendhq.com','Bearer','KWDZNSo67gRgRdxANKYrG_hyDFMY9MH5WM4yOrhA');
 			$vends = [];
+			// return var_dump($vend->getProducts()[16]->inventory[0]->count);
+			// return var_dump($vend->getProducts()[16]->base_name);
 			foreach ($vend->getProducts() as $key => $value) {
-				// array_push($vends, $key);
+				$name = $value->base_name;
+				$variant_title = $value->variant_option_one_value;
+				$sku = $value->sku;
+				$price = $value->price;
+
+				$product = Product::where("sku","=",$sku)->first();
+				
+				if (is_null($value->inventory[0])) {
+					continue;
+				}
+				if ($product->count() > 0) {
+					$product = $product->firstOrFail();
+					$current_quantity = $product->quantity;
+					$api_quantity = $value->inventory[0]->count;
+					$quantity = min($current_quantity,$api_quantity);
+				} else {
+					$product = new Product;
+					$quantity = $value->inventory[0]->count;
+				}
+
+				$product->name = $name." (".$variant_title.")";
+				$product->sku = $sku;
+				$product->price = $price;
+				$product->quantity = $quantity;
+				$product->save();
 			}
-			return var_dump($vend->getProducts());
 
-				// TODO: if the token is expired, then we must request refresh of token
+			// TODO: if the token is expired, then we must request refresh of token
+			// TODO: log all updating
 
-				// try {
-					
-				// } catch (Exception $e) {
-					
-				// 	return 'dsfsd';
-				// }
-				// return var_dump($vend->request());
-				// $vend->getProducts();
-				// return var_dump(app('Illuminate\Http\Response')->status());
+			// return var_dump($vends);
+			// return var_dump(Product::all());
     }
 
-    public function index(){
+
+    public function index()
+    {
     	// cycle through all shopify products
+
+    }
+
+    private function syncShopify($data)
+    {
+		   // check if this sku exists in Shopify
+				// if not 
+					// add the record
+				// else
+		    	// update record
+    }
+
+    private function syncVend($data)
+    {
+		   // check if this sku exists in Vend
+				// if not 
+					// add the record
+				// else
+		    	// update record    	
+    }
+
+    public function example(){
+			$apiKey = env('SHOPIFY_KEY');
+  		$apiSecret = env('SHOPIFY_SECRET');
+  		$access = env('SHOPIFY_TOKEN');
+
+			$sh = App::make(
+				'ShopifyAPI',
+	    	['API_KEY' => $apiKey, 'API_SECRET' => $apiSecret]
+			);
+
+			$sh->setup(['SHOP_DOMAIN' => 'mattsteststore2.myshopify.com', 'ACCESS_TOKEN' => $access]);
+			
+			$list_args = [
+					'ALLDATA' => true,
+					'URL' => "/admin/products.json",
+			];
+			// $variant->inventory_quantity;
+			$prods = [];
+			// get a list of current products of shopify
+			$products = $sh->call($list_args)->products;
+			foreach ($products as $key => $value) {
+				foreach($value->variants as $k => $variant){
+					$sku = $variant->sku;
+					$id = $variant->id;
+
+					// get product quantity from the products in the DB by sku
+					$product = Product::where("sku","=", $sku);
+					$current_quantity = $product->first()->quantity;
+					$args = [
+							'ALLDATA' => true,
+							'URL' => "/admin/variants/".$id.".json",
+							'METHOD' => 'PUT',
+							'DATA' => [
+						   		"variant" => [
+						  							    "id" => $id,
+						  							    "inventory_quantity" => $current_quantity
+						  							  ]
+						  					]
+								  
+					];
+
+					array_push($prods, $current_quantity);
+					// change the quanitity
+					$sh->call($args);
+				}
+			}
+
+			// TODO:
+			// find all products with sku's not in $prods
+			// push that product up
+
+			// $product = Product::where("sku","=",'thr-222')->first()->quantity;
+    	// return var_dump($product);
+    	return var_dump(Product::all());
+    }
+
+    // Syncs all products, updates quantities to the lowest quantity found in the APIs
+    public function sync()
+    {
+    	// get all products from shopify to the database
+    	$this::listProductsShopify();
+
+    	// get all products from vend to the database
+    	$this::listProductsVend();
+
+    	// cycle through the products table
+    	$products = Product::all();
+
+    	$vends = [];
+    	foreach ($products as $key => $product) {
+    		// array_push($vends, $product->sku);
+	    	// push up to Shopify
+		    	$this::syncShopify($product);
+	    	// push up to Vend
+		    	$this::syncVend($product);
+    	}
     	
-    	// $product = new Product;
-    	// $product->name = Input::get('name');
-    	// $product->sku = Input::get('email');
-    	// $product->quantity = Input::get('password');
-    	// $product->price = Input::get('password');
+			return var_dump($vends);
+
     }
 
-    public function update(){
-    	// get all products from shopify
+    // displays information for one product
+    public function show()
+    {
 
-    	// get all products from vend
+    	// return a product as a json object
     }
 
-
-    public function show(){}
 
     private function requestTokenRefresh()
     {
