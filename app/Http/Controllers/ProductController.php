@@ -36,6 +36,7 @@ class ProductController extends BaseController {
 
 				$products = $sh->call($args)->products;
 				$prods = [];
+				$difference_hash = [];
 				foreach ($products as $key => $value) {
 					foreach ($value->variants as $k => $variant) {
 						$product = Product::where("sku","=", $variant->sku);
@@ -44,6 +45,7 @@ class ProductController extends BaseController {
 							$current_quantity = $product->quantity;
 							$api_quantity = $variant->inventory_quantity;
 							$difference = abs($current_quantity - $api_quantity);
+							// MISTAKE::  should only save this number somewhere else,
 							$quantity = $current_quantity - $difference;
 						} else {
 							// create variant items if skus doesn't exist
@@ -55,13 +57,15 @@ class ProductController extends BaseController {
 						$product->name = $value->title." (".$variant->title.")";
 						$product->sku = $variant->sku;
 						$product->price = $variant->price;
-						$product->quantity = $quantity;
+						$difference_hash[$product->sku] = $quantity;
 						$product->save();
 
 						// TODO: log all updating
 
 					}
 				}
+
+				return $difference;
 
     }
 
@@ -70,8 +74,7 @@ class ProductController extends BaseController {
     {
 			$vend = new VendAPI\VendAPI('https://mattsexample.vendhq.com','Bearer','KWDZNSo67gRgRdxANKYrG_hyDFMY9MH5WM4yOrhA');
 			$vends = [];
-			// return var_dump($vend->getProducts()[16]->inventory[0]->count);
-			// return var_dump($vend->getProducts()[16]->base_name);
+			$difference_hash = [];
 			foreach ($vend->getProducts() as $key => $value) {
 				$name = $value->base_name;
 				$variant_title = $value->variant_option_one_value;
@@ -100,7 +103,7 @@ class ProductController extends BaseController {
 				$product->name = $name." (".$variant_title.")";
 				$product->sku = $sku;
 				$product->price = $price;
-				$product->quantity = $quantity;
+				$difference_hash[$product->sku] = $quantity;
 				$product->save();
 			}
 
@@ -185,10 +188,37 @@ class ProductController extends BaseController {
     public function sync()
     {
     	// get all products from shopify to the database
-    	$this::listProductsShopify();
+    	$difference = [];
+    	$diff_hash = $this::listProductsShopify();
+
+    	foreach ($diff_hash as $sku => $diff) {
+    		if (isset($difference[$sku])) {
+    			$difference[$sku] += $diff;
+    		} else {
+    			$difference[$sku] = $diff;
+    		}
+    	}
 
     	// get all products from vend to the database
-    	$this::listProductsVend();
+    	$diff_hash = $this::listProductsVend();
+
+    	foreach ($diff_hash as $sku => $diff) {
+    		if (isset($difference[$sku])) {
+    			$difference[$sku] += $diff;
+    		} else {
+    			$difference[$sku] = $diff;
+    		}
+    	}
+
+    	// update db records
+
+    	foreach ($difference as $sku => $diff) {
+    		$product = Product::where("sku","=", $sku);
+    		$quantity = $product->quantity;
+    		$quantity -= $diff;
+    		$product->quantity = $quantity;
+    		$product->save();
+    	}
 
     	// TODO: want a section to push up database quanities to each API
     	// cycle through the products table
