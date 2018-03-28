@@ -65,7 +65,7 @@ class ProductController extends BaseController {
 					}
 				}
 
-				return $difference;
+				return $difference_hash;
 
     }
 
@@ -109,6 +109,7 @@ class ProductController extends BaseController {
 
 			// TODO: if the token is expired, then we must request refresh of token
 			// TODO: log all updating
+			return $difference_hash;
 
     }
 
@@ -190,7 +191,6 @@ class ProductController extends BaseController {
     	// get all products from shopify to the database
     	$difference = [];
     	$diff_hash = $this::listProductsShopify();
-
     	foreach ($diff_hash as $sku => $diff) {
     		if (isset($difference[$sku])) {
     			$difference[$sku] += $diff;
